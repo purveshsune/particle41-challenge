@@ -11,7 +11,7 @@ variable "app_name" {
 }
 
 variable "docker_image_url" {
-  description = "600627327564.dkr.ecr.us-east-1.amazonaws.com/simpletimeservice:latest"
+  description = "purveshsune/simpletimeservice"
   type        = string
 }
 

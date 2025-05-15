@@ -1,6 +1,3 @@
-# ----------------------------
-# VPC Module (uses AWS official module)
-# ----------------------------
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.1.2"
@@ -20,16 +17,10 @@ module "vpc" {
   }
 }
 
-# ----------------------------
-# ECS Cluster
-# ----------------------------
 resource "aws_ecs_cluster" "main" {
   name = "${var.app_name}-cluster"
 }
 
-# ----------------------------
-# IAM Role for Fargate Execution
-# ----------------------------
 resource "aws_iam_role" "ecs_task_exec_role" {
   name = "${var.app_name}-exec-role"
 
@@ -49,10 +40,6 @@ resource "aws_iam_role_policy_attachment" "ecs_task_exec_role_policy" {
   role       = aws_iam_role.ecs_task_exec_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
-
-# ----------------------------
-# Security Groups
-# ----------------------------
 resource "aws_security_group" "alb_sg" {
   name        = "${var.app_name}-alb-sg"
   description = "Allow HTTP"
@@ -92,10 +79,6 @@ resource "aws_security_group" "task_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-# ----------------------------
-# Application Load Balancer
-# ----------------------------
 resource "aws_lb" "alb" {
   name               = "${var.app_name}-alb"
   internal           = false
@@ -132,11 +115,6 @@ resource "aws_lb_target_group" "tg" {
     unhealthy_threshold = 2
   }
 }
-
-
-# ----------------------------
-# ECS Task Definition
-# ----------------------------
 resource "aws_ecs_task_definition" "task" {
   family                   = "${var.app_name}-task"
   network_mode             = "awsvpc"
@@ -158,10 +136,6 @@ resource "aws_ecs_task_definition" "task" {
     }
   ])
 }
-
-# ----------------------------
-# ECS Service
-# ----------------------------
 resource "aws_ecs_service" "service" {
   name            = "${var.app_name}-svc"
   cluster         = aws_ecs_cluster.main.id
