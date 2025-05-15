@@ -5,11 +5,7 @@ terraform {
       version = "6.0.0-beta1"
     }
   }
-  backend "s3" {
-    bucket = "particle41-bucket-locking"
-    key = "terraform.tfstate"
-    region = "us-east-1"
-    dynamodb_table = "particle41-table"
+  backend "local" {
   }
 }
 provider "aws" {

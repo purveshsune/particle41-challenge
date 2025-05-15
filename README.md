@@ -1,24 +1,11 @@
 
 #  Simple Time Service – Particle41 DevOps Challenge
 
-This repository contains a minimal Python FastAPI application deployed as a containerized service on AWS using ECS Fargate and managed with Terraform.
+This repository contains a minimal Python FastAPI application deployed as a containerized service on DockerHub and on AWS using ECS Fargate and managed with Terraform.
 
 The goal of this challenge is to showcase cloud-native DevOps practices by deploying a working microservice through infrastructure-as-code.
 
 ---
-
-
-##  Features
-
-- Python FastAPI service
-- Dockerized and deployed via ECS Fargate
-- Infrastructure managed entirely with Terraform
-- Remote state using S3 + DynamoDB
-- Secure deployment using private subnets and NAT
-- Clear separation of variables and config
-
----
-
 ##  Prerequisites
 
 1. **Install AWS CLI**  
@@ -29,9 +16,46 @@ The goal of this challenge is to showcase cloud-native DevOps practices by deplo
 
 3. **Install Docker (for testing container locally)**  
    https://docs.docker.com/get-docker/
+---
 
-4. **Create S3 and DynamoDB manually for Terraform State Locking to work**  
-   Update versions.tf with the S3 and DynamoDB you created manually.
+## TASK 1 Minimalist Application Development using Docker
+
+Ensure you're authenticated to your AWS account:
+
+```bash
+aws configure
+```
+
+You will be prompted to enter:
+
+- AWS Access Key ID
+- AWS Secret Access Key
+---
+##  How to Deploy
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/purveshsune/particle41-challenge.git
+cd particle41-challenge
+```
+2. **Build the Docker Image**
+```bash
+docker build -t simpletimeservice .
+```
+3. **Run the Container**
+```bash
+docker run -p 8000:8000 simpletimeservice
+```
+#### Access the service at: http://localhost:8000
+---
+## End of TASK 1
+
+# Task 2 - Terraform and Cloud: create the infrastructure to host your container.
+
+##  Prerequisites
+
+### **Docker image already published to DockerHub (Completed in above Task 1)**
 ---
 
 ##  Authentication
@@ -46,10 +70,6 @@ You will be prompted to enter:
 
 - AWS Access Key ID
 - AWS Secret Access Key
-
-
-
-
 ---
 
 ##  How to Deploy
@@ -61,17 +81,13 @@ git clone https://github.com/purveshsune/particle41-challenge.git
 cd particle41-challenge
 ```
 
-2. **Update Terraform variables (if needed)**
-
-Default values are present in `terraform.tfvars`. Modify if you'd like to override them.
-
-3. **Initialize Terraform**
+2. **Initialize Terraform**
 
 ```bash
 terraform init
 ```
 
-4. **Deploy the infrastructure**
+3. **Deploy the infrastructure**
 
 ```bash
 terraform apply
@@ -88,21 +104,18 @@ Terraform will create:
 ---
 
 ## How to Test
-
-After `terraform apply`, Terraform will output the **Application Load Balancer URL**.
-
-To verify:
-
+Once deployed, take loadbalancer URL and visit - 
 ```bash
-curl http://<load-balancer-dns>/time
+http://<alb_dns_name>
 ```
-
-
----
-
-
-
-To delete all created resources:
+You should see a JSON response like:
+```bash
+{
+  "timestamp": "2025-05-15T17:30:00",
+  "ip": "3.94.12.4"
+}
+```
+## Delete all created resources
 
 ```bash
 terraform destroy
@@ -119,8 +132,6 @@ terraform destroy
 - Private subnet ECS tasks with NAT access
 - Use of variables and `terraform.tfvars` for configuration
 - Minimal IAM permissions via separate execution role
-- Reusable and readable Terraform module layout
-- Secrets/credentials **not committed** to repo
 
 ---
 
@@ -134,9 +145,4 @@ purvesh.sune.5@gmail.com |
 
 ---
 
-## Notes
 
-- The container image is publicly hosted on Docker Hub (`purveshsune/simpletimeservice`). You may change the image URL in `terraform.tfvars`.
-- This setup uses `awsvpc` network mode for Fargate which requires at least one public subnet with NAT Gateway for ECR access.
-
----
